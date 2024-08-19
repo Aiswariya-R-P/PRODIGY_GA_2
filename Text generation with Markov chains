@@ -1,0 +1,60 @@
+import random
+
+def generate_markov_chain(text, n=2):
+    """
+    Generate a Markov chain model from the given text.
+    
+    Parameters:
+    - text: The input text to build the Markov chain from.
+    - n: The order of the Markov chain (default is 2 for bigrams).
+    
+    Returns:
+    - A dictionary where the keys are tuples of n-1 words and the values are lists of possible next words.
+    """
+    words = text.split()
+    markov_chain = {}
+    
+    for i in range(len(words) - n):
+        key = tuple(words[i:i + n - 1])
+        next_word = words[i + n - 1]
+        if key not in markov_chain:
+            markov_chain[key] = []
+        markov_chain[key].append(next_word)
+    
+    return markov_chain
+
+def generate_text(markov_chain, length=50, seed=None):
+    """
+    Generate text using the Markov chain model.
+    
+    Parameters:
+    - markov_chain: The Markov chain model.
+    - length: The length of the generated text (number of words).
+    - seed: Optional seed tuple to start the generation.
+    
+    Returns:
+    - A string of generated text.
+    """
+    if seed is None:
+        seed = random.choice(list(markov_chain.keys()))
+    
+    output = list(seed)
+    
+    for _ in range(length - len(seed)):
+        state = tuple(output[-len(seed):])
+        if state not in markov_chain:
+            break
+        next_word = random.choice(markov_chain[state])
+        output.append(next_word)
+    
+    return ' '.join(output)
+
+# Example usage
+text = """Markov chains are a type of stochastic model used to represent systems that transition from one state to another in a chain-like process. 
+This simple example demonstrates how to use Markov chains to generate text."""
+
+markov_chain = generate_markov_chain(text, n=2)
+generated_text = generate_text(markov_chain, length=50)
+
+print("Generated Text:")
+print(generated_text)
